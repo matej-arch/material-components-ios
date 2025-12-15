@@ -58,10 +58,21 @@
 }
 
 - (UIImage *)createImageWithLayer:(CALayer *)layer {
-  UIGraphicsBeginImageContext(layer.frame.size);
-  [layer renderInContext:UIGraphicsGetCurrentContext()];
+  CGSize size = layer.bounds.size;
+
+  if (size.width <= 0 || size.height <= 0) {
+    return nil;
+  }
+
+  UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  if (context) {
+    [layer renderInContext:context];
+  }
+
   UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
+
   return image;
 }
 
