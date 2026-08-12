@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #import "MDCTextControlGradientManager.h"
-
 #import <UIKit/UIKit.h>
 
 @interface MDCTextControlGradientManager ()
@@ -37,7 +36,6 @@
   self.horizontalGradient.colors = colors;
   self.horizontalGradient.startPoint = CGPointMake(0.0, 0.5);
   self.horizontalGradient.endPoint = CGPointMake(1.0, 0.5);
-
   self.verticalGradient = [CAGradientLayer layer];
   self.verticalGradient.colors = colors;
   self.verticalGradient.startPoint = CGPointMake(0.5, 0.0);
@@ -58,25 +56,26 @@
 }
 
 - (UIImage *)createImageWithLayer:(CALayer *)layer {
-  CGSize size = layer.bounds.size;
-
+  CGSize size = layer.frame.size;
   if (size.width <= 0 || size.height <= 0) {
     return nil;
   }
-
-  UIGraphicsBeginImageContextWithOptions(size, NO, UIScreen.mainScreen.scale);
+  UIGraphicsBeginImageContext(size);
   CGContextRef context = UIGraphicsGetCurrentContext();
-  if (context) {
-    [layer renderInContext:context];
+  if (!context) {
+    UIGraphicsEndImageContext();
+    return nil;
   }
-
+  [layer renderInContext:context];
   UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
-
   return image;
 }
 
 - (CALayer *)createLayerWithImage:(UIImage *)image {
+  if (!image) {
+    return nil;
+  }
   CALayer *layer = [[CALayer alloc] init];
   layer.frame = CGRectMake(0, 0, image.size.width, image.size.height);
   layer.contents = (__bridge id _Nullable)(image.CGImage);
